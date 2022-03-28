@@ -1,4 +1,4 @@
-from bot.bot import MusicBot
+from src.bot import MusicBot
 
 
 def main():

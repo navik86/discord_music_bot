@@ -2,3 +2,4 @@
 /venv
 /config/logs
 /config/Lavalink.jar
+/.env

@@ -1,9 +1,12 @@
 version: "3.9"
 
 services:
+  lavalink:
+    image: lavalink
+    restart: always
 
   music_bot:
     restart: always
     build:
-      context: ./music_bot
-    command: ["python3", "start.py"]
+      context: .
+    command: ["python3", "main.py"]
