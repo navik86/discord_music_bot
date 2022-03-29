@@ -13,6 +13,15 @@ class Media(commands.Cog):
         self.vc = ''
         self.is_playing = False
 
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author == self.bot.user:
+            return
+
+        if message.content.startswith('Song added'):
+            await message.channel.send(MUSIC_QUEUE)
+            await self.play_back_handler()
+
     async def play_back_handler(self):
         if len(MUSIC_QUEUE) > 0:
             self.is_playing = True
@@ -25,6 +34,17 @@ class Media(commands.Cog):
                 await self.vc.move_to(MUSIC_QUEUE[0][1])
 
             print(MUSIC_QUEUE)
+            MUSIC_QUEUE.pop(0)
+
+            self.vc.play(discord.FFmpegPCMAudio(m_url, **self.FFMPEG_OPTIONS), after=lambda e: self.play_next())
+        else:
+            self.is_playing = False
+
+    def play_next(self):
+        if len(MUSIC_QUEUE) > 0:
+            self.is_playing = True
+
+            m_url = MUSIC_QUEUE[0][0]['source']
 
             MUSIC_QUEUE.pop(0)
 
