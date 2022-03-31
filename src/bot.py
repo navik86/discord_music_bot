@@ -1,14 +1,17 @@
 from discord.ext import commands
-
 from src.config import config
-from media.player import PLAY_COMMANDS
+import queue
+
+from src.media.bot_commands import commands_list
 
 
 class MusicBot(commands.Bot):
 
     def __init__(self):
+        self.playback_queue = queue.Queue()
         self._cogs = ["src.media.media"]
-        self.additional_commands = [PLAY_COMMANDS]
+        self.additional_commands = [commands_list]
+        # self.additional_events = [events_list]
         super().__init__(
             command_prefix=config.PREFIX,
             case_insensitive=True,
@@ -24,6 +27,10 @@ class MusicBot(commands.Bot):
         for item in self.additional_commands:
             for j in item:
                 self.add_command(j)
+
+        # for item in self.additional_events:
+        #     for j in item:
+        #         self.add_listener(j)
 
         print("Setup complete.")
 

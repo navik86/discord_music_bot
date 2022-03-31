@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from .music_queue import MUSIC_QUEUE
+from src.media.bot_commands.bot_commands import play, skip
 
 
 class Media(commands.Cog):
@@ -14,41 +14,35 @@ class Media(commands.Cog):
         self.is_playing = False
 
     @commands.Cog.listener()
-    async def on_message(self, message):
-        if message.author == self.bot.user:
-            return
+    async def on_command_completion(self, ctx):
+        if ctx.command == play or ctx.command == skip and self.bot.playback_queue.qsize > 0:
+            await self.playback()
 
-        if message.content.startswith('Song added'):
-            await message.channel.send(MUSIC_QUEUE)
-            await self.play_back_handler()
+    async def playback(self):
+        self.is_playing = True
+        item = self.bot.playback_queue.get()
+        url = item[0]['source']
+        voice_channel = item[1]
 
-    async def play_back_handler(self):
-        if len(MUSIC_QUEUE) > 0:
-            self.is_playing = True
+        if self.vc == "" or not self.vc.is_connected() or self.vc is None:
+            self.vc = await voice_channel.connect()
+        else:
+            await self.vc.move_to(voice_channel)
 
-            m_url = MUSIC_QUEUE[0][0]['source']
+        self.vc.play(discord.FFmpegPCMAudio(url, **self.FFMPEG_OPTIONS))
 
-            if self.vc == "" or not self.vc.is_connected() or self.vc is None:
-                self.vc = await MUSIC_QUEUE[0][1].connect()
-            else:
-                await self.vc.move_to(MUSIC_QUEUE[0][1])
-
-            print(MUSIC_QUEUE)
-            MUSIC_QUEUE.pop(0)
-
-            self.vc.play(discord.FFmpegPCMAudio(m_url, **self.FFMPEG_OPTIONS), after=lambda e: self.play_next())
+        if self.bot.playback_queue.qsize > 0:
+            self.play_next()
         else:
             self.is_playing = False
+            await self.vc.disconnect()
 
     def play_next(self):
-        if len(MUSIC_QUEUE) > 0:
+        if self.bot.playback_queue.qsize > 0:
             self.is_playing = True
-
-            m_url = MUSIC_QUEUE[0][0]['source']
-
-            MUSIC_QUEUE.pop(0)
-
-            self.vc.play(discord.FFmpegPCMAudio(m_url, **self.FFMPEG_OPTIONS), after=lambda e: self.play_next())
+            item = self.bot.playback_queue.get()
+            url = item[0]['source']
+            self.vc.play(discord.FFmpegPCMAudio(url, **self.FFMPEG_OPTIONS), after=lambda e: self.play_next())
         else:
             self.is_playing = False
 

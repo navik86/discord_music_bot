@@ -1,1 +1,1 @@
-from . import media, media_source, exceptions, keyboards, music_queue, player
+from . import media, media_source, exceptions, keyboards
