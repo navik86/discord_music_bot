@@ -12,9 +12,12 @@ async def track(ctx):
 async def play(ctx, args):
     """Поиск музыки и добавление в очередь"""
     voice_channel = ctx.author.voice.channel
+    if voice_channel is None:
+        await ctx.send("Зайдите в голосовой канал")
     data = YoutubeSource.get_by_link(args)
     queue = ctx.bot.playback_queue
     queue.put((data, voice_channel))
+    await ctx.send("Трэк добавлен в очередь")
 
 
 @commands.command()

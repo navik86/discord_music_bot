@@ -15,30 +15,30 @@ class Media(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_completion(self, ctx):
-        if ctx.command == play or ctx.command == skip and self.bot.playback_queue.qsize > 0:
+        if self.is_playing is True:
+            return
+        if ctx.command == play or ctx.command == skip and self.bot.playback_queue.qsize() > 0:
             await self.playback()
 
     async def playback(self):
-        self.is_playing = True
-        item = self.bot.playback_queue.get()
-        url = item[0]['source']
-        voice_channel = item[1]
+        if self.bot.playback_queue.qsize() > 0:
+            self.is_playing = True
+            item = self.bot.playback_queue.get()
+            url = item[0]['source']
+            voice_channel = item[1]
 
-        if self.vc == "" or not self.vc.is_connected() or self.vc is None:
-            self.vc = await voice_channel.connect()
-        else:
-            await self.vc.move_to(voice_channel)
+            if self.vc == "" or not self.vc.is_connected() or self.vc is None:
+                self.vc = await voice_channel.connect()
+            else:
+                await self.vc.move_to(voice_channel)
 
-        self.vc.play(discord.FFmpegPCMAudio(url, **self.FFMPEG_OPTIONS))
+            self.vc.play(discord.FFmpegPCMAudio(url, **self.FFMPEG_OPTIONS), after=lambda e: self.play_next())
 
-        if self.bot.playback_queue.qsize > 0:
-            self.play_next()
         else:
             self.is_playing = False
-            await self.vc.disconnect()
 
     def play_next(self):
-        if self.bot.playback_queue.qsize > 0:
+        if self.bot.playback_queue.qsize() > 0:
             self.is_playing = True
             item = self.bot.playback_queue.get()
             url = item[0]['source']
