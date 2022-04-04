@@ -21,7 +21,6 @@ class Media(commands.Cog):
             await self.playback()
 
     async def playback(self):
-        print('playback')
         if self.bot.playback_queue.qsize() > 0:
             self.is_playing = True
             item = self.bot.playback_queue.get()
@@ -34,7 +33,6 @@ class Media(commands.Cog):
                 await self.vc.move_to(voice_channel)
 
             self.vc.play(discord.FFmpegPCMAudio(url, **self.FFMPEG_OPTIONS), after=lambda e: self.play_next())
-
         else:
             self.is_playing = False
 

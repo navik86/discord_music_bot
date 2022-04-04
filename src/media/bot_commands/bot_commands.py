@@ -1,5 +1,5 @@
 from discord.ext import commands
-from src.media.media_source import YoutubeSource
+from src.media.media_source import YoutubeSource, SpotifySource
 
 
 @commands.command()
@@ -22,16 +22,17 @@ async def play(ctx, *, query=None):
     if query is None:
         await ctx.send("После play укажите url или поисковый запрос")
         return
-
-    if query.startswith('http'):
-        print("if")
-        data = YoutubeSource.get_by_link(query)
-        queue.put((data, voice_channel))
-        print(queue.qsize())
-        await ctx.send("Трек добавлен в очередь")
     else:
-        data = YoutubeSource.get_by_search(query)
-        queue.put((data, voice_channel))
+        if query.startswith('https://www.youtu'):
+            data = YoutubeSource.get_by_link(query)
+            queue.put((data, voice_channel))
+        elif query.startswith('https://open.spoti'):
+            data = SpotifySource.get_by_link(query)
+            print(data)
+            queue.put((data, voice_channel))
+        else:
+            data = YoutubeSource.get_by_search(query)
+            queue.put((data, voice_channel))
         await ctx.send("Трек добавлен в очередь")
 
 

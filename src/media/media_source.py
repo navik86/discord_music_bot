@@ -1,7 +1,11 @@
 from abc import ABC, abstractmethod
+import spotipy
+from spotipy import SpotifyClientCredentials
 from youtube_dl import YoutubeDL
 from ytmusicapi import YTMusic
 
+
+from src.config.config import SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET
 
 YDL_OPTIONS = {
     'format': 'bestaudio/best',
@@ -19,15 +23,18 @@ YDL_OPTIONS = {
     'source_address': '0.0.0.0',
 }
 
+spotify_client = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(
+        client_id=SPOTIFY_CLIENT_ID, client_secret=SPOTIFY_CLIENT_SECRET))
+
 
 class MediaSource(ABC):
 
     @abstractmethod
-    def get_by_search(self, text):
+    def get_by_search(self, search_query):
         pass
 
     @abstractmethod
-    def get_by_link(self, link):
+    def get_by_link(self, url):
         pass
 
 
@@ -47,4 +54,80 @@ class YoutubeSource(MediaSource):
 
 
 class SpotifySource(MediaSource):
-    pass
+
+    @classmethod
+    def get_by_search(cls, search_query):
+        pass
+
+    @classmethod
+    def get_by_link(cls, url):
+
+        try:
+            link_type = url.split('/')[3]
+            _id = url.split('/')[4]
+            if '?' in _id:
+                _id = _id[:_id.index('?')]
+        except IndexError:
+            return 'Unknown spotify url'
+
+        if link_type == 'track':
+            information = spotify_client.track(_id)
+
+            track_name = ''
+            for artist in information['artists']:
+                if information['artists'].index(artist) == 0:
+                    track_name += artist['name']
+                else:
+                    track_name += ', ' + artist['name']
+            track_name += ' - ' + information['name']
+
+            return {
+                'source': information['external_urls']['spotify'],
+                'title': track_name
+            }
+        elif link_type == 'album':
+            information = spotify_client.album(_id)
+
+            tracks = []
+            for track in information['tracks']['items']:
+                track_name = ''
+                for artist in track['artists']:
+                    if track['artists'].index(artist) == 0:
+                        track_name += artist['name']
+                    else:
+                        track_name += ', ' + artist['name']
+                track_name += ' - ' + track['name']
+                tracks.append({
+                    'type': 'track',
+                    'name': track_name,
+                    'link': track['external_urls']['spotify']
+                })
+
+            return {
+                'source': information['external_urls']['spotify'],
+                'title': information['name']
+            }
+        elif link_type == 'playlist':
+            information = spotify_client.playlist(_id)
+
+            tracks = []
+            for track in information['tracks']['items']:
+                track_name = ''
+                for artist in track['track']['artists']:
+                    if track['track']['artists'].index(artist) == 0:
+                        track_name += artist['name']
+                    else:
+                        track_name += ', ' + artist['name']
+                track_name += ' - ' + track['track']['name']
+                tracks.append({
+                    'type': 'track',
+                    'name': track_name,
+                    'link': track['track']['external_urls']['spotify']
+                })
+
+            return {
+                'source': information['external_urls']['spotify'],
+                'title': information['name']
+            }
+        else:
+            return 'Unknown spotify url'
