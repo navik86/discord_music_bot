@@ -17,10 +17,11 @@ class Media(commands.Cog):
     async def on_command_completion(self, ctx):
         if self.is_playing is True:
             return
-        if ctx.command == play or ctx.command == skip and self.bot.playback_queue.qsize() > 0:
+        if (ctx.command == play or ctx.command == skip) and self.bot.playback_queue.qsize() > 0:
             await self.playback()
 
     async def playback(self):
+        print('playback')
         if self.bot.playback_queue.qsize() > 0:
             self.is_playing = True
             item = self.bot.playback_queue.get()

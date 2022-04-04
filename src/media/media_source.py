@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from youtube_dl import YoutubeDL
+from ytmusicapi import YTMusic
 
 
 YDL_OPTIONS = {
@@ -33,8 +34,10 @@ class MediaSource(ABC):
 class YoutubeSource(MediaSource):
 
     @classmethod
-    def get_by_search(cls, item):
-        pass
+    def get_by_search(cls, search_query):
+        ytm_client = YTMusic()
+        url = 'https://www.youtube.com/watch?v=' + ytm_client.search(query=search_query, filter='songs')[0]['videoId']
+        return cls.get_by_link(url)
 
     @classmethod
     def get_by_link(cls, url):

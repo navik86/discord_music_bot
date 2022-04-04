@@ -9,18 +9,33 @@ async def track(ctx):
 
 
 @commands.command()
-async def play(ctx, args):
+async def play(ctx, *, query=None):
     """Поиск музыки и добавление в очередь"""
-    voice_channel = ctx.author.voice.channel
-    if voice_channel is None:
-        await ctx.send("Зайдите в голосовой канал")
-    data = YoutubeSource.get_by_link(args)
     queue = ctx.bot.playback_queue
-    queue.put((data, voice_channel))
-    await ctx.send("Трэк добавлен в очередь")
+
+    try:
+        voice_channel = ctx.author.voice.channel
+    except AttributeError:
+        await ctx.send("Зайдите в голосовой канал")
+        return
+
+    if query is None:
+        await ctx.send("После play укажите url или поисковый запрос")
+        return
+
+    if query.startswith('http'):
+        print("if")
+        data = YoutubeSource.get_by_link(query)
+        queue.put((data, voice_channel))
+        print(queue.qsize())
+        await ctx.send("Трек добавлен в очередь")
+    else:
+        data = YoutubeSource.get_by_search(query)
+        queue.put((data, voice_channel))
+        await ctx.send("Трек добавлен в очередь")
 
 
-@commands.command()
+@commands.command(aliases=['p'])
 async def pause(ctx):
     """Ставит музыку на паузу"""
     voice = ctx.guild.voice_client
@@ -31,7 +46,7 @@ async def pause(ctx):
         await ctx.channel(f'{ctx.author.mention}, Музыка не воспроизводится')
 
 
-@commands.command()
+@commands.command(aliases=['r'])
 async def resume(ctx):
     """Продолжить воспроизведение музыки"""
     voice = ctx.guild.voice_client
