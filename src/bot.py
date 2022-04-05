@@ -9,6 +9,7 @@ class MusicBot(commands.Bot):
 
     def __init__(self):
         self.playback_queue = queue.Queue()
+        self.current_track = None
         self._cogs = ["src.media.media"]
         self.additional_commands = [commands_list]
         # self.additional_events = [events_list]

@@ -23,9 +23,9 @@ class Media(commands.Cog):
     async def playback(self):
         if self.bot.playback_queue.qsize() > 0:
             self.is_playing = True
-            item = self.bot.playback_queue.get()
-            url = item[0]['source']
-            voice_channel = item[1]
+            self.bot.current_track = self.bot.playback_queue.get()
+            url = self.bot.current_track[0]['source']
+            voice_channel = self.bot.current_track[1]
 
             if self.vc == "" or not self.vc.is_connected() or self.vc is None:
                 self.vc = await voice_channel.connect()

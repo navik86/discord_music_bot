@@ -5,7 +5,13 @@ from src.media.media_source import YoutubeSource, SpotifySource
 @commands.command()
 async def track(ctx):
     """Показывает текущий трек в очереди"""
-    pass
+    voice = ctx.guild.voice_client
+
+    if voice is None:
+        await ctx.channel.send(f'{ctx.author.mention}, нет трэков для проигрывания')
+    else:
+        track_name = ctx.bot.current_track[0]['title']
+        await ctx.channel.send(f'Проигрывается: {track_name}')
 
 
 @commands.command()
@@ -28,7 +34,6 @@ async def play(ctx, *, query=None):
             queue.put((data, voice_channel))
         elif query.startswith('https://open.spoti'):
             data = SpotifySource.get_by_link(query)
-            print(data)
             queue.put((data, voice_channel))
         else:
             data = YoutubeSource.get_by_search(query)
