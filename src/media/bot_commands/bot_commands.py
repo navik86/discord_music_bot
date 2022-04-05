@@ -1,3 +1,4 @@
+from discord import Embed
 from discord.ext import commands
 from src.media.media_source import YoutubeSource, SpotifySource
 
@@ -8,10 +9,17 @@ async def track(ctx):
     voice = ctx.guild.voice_client
 
     if voice is None:
-        await ctx.channel.send(f'{ctx.author.mention}, нет трэков для проигрывания')
+        desc = 'Нет треков для проигрывания, используйте команду !play'
+        embed = Embed(title="Текущий трек:", description=desc, color=0x00ff00)
+        await ctx.channel.send(embed=embed)
     else:
         track_name = ctx.bot.current_track[0]['title']
-        await ctx.channel.send(f'Проигрывается: {track_name}')
+        embed = Embed(
+            title="Текущий трек:",
+            description=track_name,
+            color=0x00ff00
+        )
+        await ctx.channel.send(embed=embed)
 
 
 @commands.command()
