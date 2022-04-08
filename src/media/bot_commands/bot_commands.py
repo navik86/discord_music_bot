@@ -14,11 +14,20 @@ async def track(ctx):
         await ctx.channel.send(embed=embed)
     else:
         track_name = ctx.bot.current_track[0]['title']
+        creator_name = ctx.bot.current_track[0]['creator']
         embed = Embed(
-            title="Текущий трек:",
-            description=track_name,
+            title="Текущий трек: ",
+            description=" ",
             color=0x00ff00
         )
+        embed.add_field(name=track_name, value=creator_name, inline=False)
+        show_queue = ctx.bot.playback_queue.queue
+        if len(show_queue) > 0:
+            embed.add_field(name="------------------", value="Очередь проигрывания:", inline=False)
+            counter = 1
+            for i in show_queue:
+                embed.add_field(name=f"{counter}. {i[0]['title']}", value=i[0]['creator'], inline=False)
+                counter += 1
         await ctx.channel.send(embed=embed)
 
 
@@ -36,16 +45,28 @@ async def play(ctx, *, query=None):
     if query is None:
         await ctx.send("После play укажите url или поисковый запрос")
         return
-    else:
-        if query.startswith('https://www.youtu'):
-            data = YoutubeSource.get_by_link(query)
-            queue.put((data, voice_channel))
-        elif query.startswith('https://open.spoti'):
-            data = SpotifySource.get_by_link(query)
-            queue.put((data, voice_channel))
+
+    if query.startswith('https://www.youtu'):
+        data = YoutubeSource.get_by_link(query)
+        if type(data) is list:
+            [queue.put((i, voice_channel)) for i in data]
+            await ctx.send("Треки добавлены в очередь")
         else:
-            data = YoutubeSource.get_by_search(query)
             queue.put((data, voice_channel))
+            await ctx.send("Трек добавлен в очередь")
+
+    elif query.startswith('https://open.spoti'):
+        data = SpotifySource.get_by_link(query)
+        if type(data) is list:
+            [queue.put((i, voice_channel)) for i in data]
+            await ctx.send("Треки добавлены в очередь")
+        else:
+            queue.put((data, voice_channel))
+            await ctx.send("Трек добавлен в очередь")
+
+    else:
+        data = YoutubeSource.get_by_search(query)
+        queue.put((data, voice_channel))
         await ctx.send("Трек добавлен в очередь")
 
 

@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 import spotipy
 from spotipy import SpotifyClientCredentials
 from youtube_dl import YoutubeDL
@@ -50,7 +51,7 @@ class YoutubeSource(MediaSource):
     def get_by_link(cls, url):
         with YoutubeDL(YDL_OPTIONS) as ydl:
             info = ydl.extract_info(url, download=False)
-        return {'source': info['formats'][0]['url'], 'title': info['title']}
+        return {'source': info['formats'][0]['url'], 'title': info['title'], 'creator': info['creator']}
 
 
 class SpotifySource(MediaSource):
@@ -61,6 +62,32 @@ class SpotifySource(MediaSource):
 
     @classmethod
     def get_by_link(cls, url):
+        spotify_playlist = []
+
+        try:
+            spotify_link_info = cls.get_info_from_spotify_link(url)
+        except spotipy.SpotifyException:
+            return "Что то пошло не так"
+
+        if spotify_link_info['type'] == 'track':
+            url = YoutubeSource.get_by_search(spotify_link_info['name'])
+            return url
+        else:
+            # если это плейлист или альбом Spotify
+            for track in spotify_link_info['tracks']:
+                try:
+                    url = YoutubeSource.get_by_search(track['name'])
+                    spotify_playlist.append(url)
+                except IndexError:
+                    return "Один из треков не найден"
+
+            # если не все треки найдены, возврат
+            if len(spotify_playlist) == 0:
+                return
+            return spotify_playlist
+
+    @classmethod
+    def get_info_from_spotify_link(cls, url):
 
         try:
             link_type = url.split('/')[3]
@@ -70,6 +97,7 @@ class SpotifySource(MediaSource):
         except IndexError:
             return 'Unknown spotify url'
 
+        # получение информации о треке в зависимости от типа ссылки
         if link_type == 'track':
             information = spotify_client.track(_id)
 
@@ -82,8 +110,9 @@ class SpotifySource(MediaSource):
             track_name += ' - ' + information['name']
 
             return {
-                'source': information['external_urls']['spotify'],
-                'title': track_name
+                'type': 'track',
+                'name': track_name,
+                'link': information['external_urls']['spotify']
             }
         elif link_type == 'album':
             information = spotify_client.album(_id)
@@ -104,8 +133,10 @@ class SpotifySource(MediaSource):
                 })
 
             return {
-                'source': information['external_urls']['spotify'],
-                'title': information['name']
+                'type': 'album',
+                'name': information['name'],
+                'link': information['external_urls']['spotify'],
+                'tracks': tracks
             }
         elif link_type == 'playlist':
             information = spotify_client.playlist(_id)
@@ -126,8 +157,10 @@ class SpotifySource(MediaSource):
                 })
 
             return {
-                'source': information['external_urls']['spotify'],
-                'title': information['name']
+                'type': 'playlist',
+                'name': information['name'],
+                'link': information['external_urls']['spotify'],
+                'tracks': tracks
             }
         else:
             return 'Unknown spotify url'
