@@ -2,21 +2,20 @@ from discord.ext import commands
 from src.config import config
 import queue
 
-from src.media.bot_commands import commands_list
-
 
 class MusicBot(commands.Bot):
 
-    def __init__(self):
+    def __init__(self, additional_commands=None):
         self.playback_queue = queue.Queue()
         self.current_track = None
         self._cogs = ["src.media.media"]
-        self.additional_commands = [commands_list]
-        # self.additional_events = [events_list]
         super().__init__(
             command_prefix=config.PREFIX,
             case_insensitive=True,
         )
+        self.setup()
+        if additional_commands:
+            self.register_commands(additional_commands)
 
     def setup(self):
         print("Running setup...")
@@ -25,18 +24,15 @@ class MusicBot(commands.Bot):
             self.load_extension(cog)
             print(f"Loaded {cog}")
 
-        for item in self.additional_commands:
+        print("Setup complete.")
+
+    def register_commands(self, additional_commands):
+
+        for item in additional_commands:
             for j in item:
                 self.add_command(j)
 
-        # for item in self.additional_events:
-        #     for j in item:
-        #         self.add_listener(j)
-
-        print("Setup complete.")
-
     def run(self):
-        self.setup()
         print("Running src...")
         super().run(config.BOT_TOKEN, reconnect=True)
 

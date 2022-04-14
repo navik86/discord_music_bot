@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from src.media.bot_commands.bot_commands import play, skip
 
 
 class Media(commands.Cog):
@@ -17,7 +16,7 @@ class Media(commands.Cog):
     async def on_command_completion(self, ctx):
         if self.is_playing is True:
             return
-        if (ctx.command == play or ctx.command == skip) and self.bot.playback_queue.qsize() > 0:
+        if (ctx.command.name == "play" or ctx.command.name == "skip") and self.bot.playback_queue.qsize() > 0:
             await self.playback()
 
     async def playback(self):
