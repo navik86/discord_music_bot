@@ -111,8 +111,7 @@ class SpotifySource(MediaSource):
 
             return {
                 'type': 'track',
-                'name': track_name,
-                'link': information['external_urls']['spotify']
+                'name': track_name
             }
         elif link_type == 'album':
             information = spotify_client.album(_id)
@@ -129,13 +128,11 @@ class SpotifySource(MediaSource):
                 tracks.append({
                     'type': 'track',
                     'name': track_name,
-                    'link': track['external_urls']['spotify']
                 })
 
             return {
                 'type': 'album',
                 'name': information['name'],
-                'link': information['external_urls']['spotify'],
                 'tracks': tracks
             }
         elif link_type == 'playlist':
@@ -152,14 +149,12 @@ class SpotifySource(MediaSource):
                 track_name += ' - ' + track['track']['name']
                 tracks.append({
                     'type': 'track',
-                    'name': track_name,
-                    'link': track['track']['external_urls']['spotify']
+                    'name': track_name
                 })
 
             return {
                 'type': 'playlist',
                 'name': information['name'],
-                'link': information['external_urls']['spotify'],
                 'tracks': tracks
             }
         else:

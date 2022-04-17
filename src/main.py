@@ -4,6 +4,7 @@ from src.media.bot_commands import commands_list
 
 def main():
     bot = MusicBot([commands_list])
+    print(bot.commands)
     bot.run()
 
 
