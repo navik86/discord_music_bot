@@ -1,6 +1,9 @@
-from unittest import TestCase
-from media.media import Media
+from unittest import IsolatedAsyncioTestCase, main
 
 
-class MediaTestCase(TestCase):
+class MediaTestCase(IsolatedAsyncioTestCase):
     pass
+
+
+if __name__ == '__main__':
+    main()

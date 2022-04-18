@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, main
 from media.media_source import SpotifySource, YoutubeSource
 
 
@@ -57,3 +57,7 @@ class MediaSourceTestCase(TestCase):
         for test_case in test_cases:
             result = SpotifySource.get_info_from_spotify_link(test_case['arguments'])
             self.assertEqual(test_case['expected_result'], result)
+
+
+if __name__ == '__main__':
+    main()

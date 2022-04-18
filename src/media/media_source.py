@@ -5,8 +5,8 @@ from spotipy import SpotifyClientCredentials
 from youtube_dl import YoutubeDL
 from ytmusicapi import YTMusic
 
-
 from src.config.config import SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET
+
 
 YDL_OPTIONS = {
     'format': 'bestaudio/best',

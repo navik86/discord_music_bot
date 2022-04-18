@@ -1,5 +1,5 @@
 from discord.ext import commands
-from src.config import config
+from config import config
 import queue
 
 
