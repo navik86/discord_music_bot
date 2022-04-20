@@ -4,6 +4,7 @@ from src.media.media_source import YoutubeSource, SpotifySource
 
 
 @commands.command()
+@commands.has_role('DJ')
 async def track(ctx):
     """Показывает текущий трек в очереди"""
     voice = ctx.guild.voice_client
@@ -32,6 +33,7 @@ async def track(ctx):
 
 
 @commands.command()
+@commands.has_role('DJ')
 async def play(ctx, *, query=None):
     """Поиск музыки и добавление в очередь"""
     queue = ctx.bot.playback_queue
@@ -72,6 +74,7 @@ async def play(ctx, *, query=None):
 
 
 @commands.command(aliases=['p'])
+@commands.has_role('DJ')
 async def pause(ctx):
     """Ставит музыку на паузу"""
     voice = ctx.guild.voice_client
@@ -83,6 +86,7 @@ async def pause(ctx):
 
 
 @commands.command(aliases=['r'])
+@commands.has_role('DJ')
 async def resume(ctx):
     """Продолжить воспроизведение музыки"""
     voice = ctx.guild.voice_client
@@ -94,6 +98,7 @@ async def resume(ctx):
 
 
 @commands.command()
+@commands.has_role('DJ')
 async def stop(ctx):
     """Прекращает воспроизведение музыки"""
     voice = ctx.guild.voice_client
@@ -101,6 +106,7 @@ async def stop(ctx):
 
 
 @commands.command()
+@commands.has_role('DJ')
 async def skip(ctx):
     """Пропустить песню"""
     voice = ctx.guild.voice_client
@@ -109,6 +115,7 @@ async def skip(ctx):
 
 
 @commands.command()
+@commands.has_role('DJ')
 async def leave(ctx):
     """Командует выйти из войса"""
     voice = ctx.guild.voice_client
