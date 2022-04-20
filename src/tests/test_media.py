@@ -1,7 +1,7 @@
-from unittest import IsolatedAsyncioTestCase, main
+from unittest import TestCase, main
 
 
-class MediaTestCase(IsolatedAsyncioTestCase):
+class MediaTestCase(TestCase):
     pass
 
 

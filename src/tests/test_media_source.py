@@ -1,17 +1,28 @@
 from unittest import TestCase, main
+from unittest.mock import MagicMock, patch
+
 from media.media_source import SpotifySource, YoutubeSource
 
 
 class MediaSourceTestCase(TestCase):
 
-    def test_get_by_link(self):
-        url = 'https://www.youtube.com/watch?v=_FrOQC-zEog'
-        expected_result = {
-            'source': 'https://www.youtube.com/wa',
-            'title': 'Pink Floyd - Comfortably numb',
-            'creator': 'Pink Floyd'}
-        result = YoutubeSource.get_by_link(url)
-        self.assertEqual(expected_result['title'], result['title'])
+    @patch('media.media_source.requests')
+    def test_get_by_search(self, requests_mock):
+
+        with open('youtube_search_api_example.json', 'r') as f:
+            body = f.read()
+
+        request_response_mock = MagicMock()
+        request_response_mock.status_code = 200
+        request_response_mock.text = body
+
+        requests_mock.get.return_value = request_response_mock
+        expected_url = 'https://www.youtube.com/watch?v=_FrOQC-zEog'
+
+        self.assertEqual(
+            expected_url,
+            YoutubeSource.get_by_search('pink floyd - comfortably numb')
+        )
 
     def test_get_info_from_spotify_link(self):
         test_cases = [

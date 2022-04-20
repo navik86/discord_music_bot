@@ -65,7 +65,8 @@ async def play(ctx, *, query=None):
             await ctx.send("Трек добавлен в очередь")
 
     else:
-        data = YoutubeSource.get_by_search(query)
+        url = YoutubeSource.get_by_search(query)
+        data = YoutubeSource.get_by_link(url)
         queue.put((data, voice_channel))
         await ctx.send("Трек добавлен в очередь")
 
