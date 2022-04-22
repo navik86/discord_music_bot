@@ -1,13 +1,11 @@
-import json
 from abc import ABC, abstractmethod
 
-import requests
 import spotipy
 from spotipy import SpotifyClientCredentials
 from youtube_dl import YoutubeDL
 from ytmusicapi import YTMusic
 
-from src.config.config import SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, YOUTUBE_TOKEN
+from src.config.config import SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET
 
 
 YDL_OPTIONS = {
@@ -45,19 +43,14 @@ class YoutubeSource(MediaSource):
 
     @classmethod
     def get_by_search(cls, search_query):
-        youtube_api_url = "https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q={}&key={}"
-        response = requests.get(youtube_api_url.format(search_query, YOUTUBE_TOKEN))
-        text_attribute = response.text
-        json_data = json.loads(text_attribute)
-        tail = json_data['items'][0]['id']['videoId']
-        url = 'https://www.youtube.com/watch?v=' + tail
-        return url
+        ytm_client = YTMusic()
+        url = 'https://www.youtube.com/watch?v=' + ytm_client.search(query=search_query, filter='songs')[0]['videoId']
+        return cls.get_by_link(url)
 
     @classmethod
     def get_by_link(cls, url):
         with YoutubeDL(YDL_OPTIONS) as ydl:
             info = ydl.extract_info(url, download=False)
-        print(info)
         return {'source': info['formats'][0]['url'], 'title': info['title'], 'creator': info['creator']}
 
 

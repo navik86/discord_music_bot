@@ -26,9 +26,9 @@ class Media(commands.Cog):
             self.is_playing = True
             self.bot.current_track = self.bot.playback_queue.get()
 
-            # track = self.bot.current_track[0]['title']
-            # creator = self.bot.current_track[0]['creator']
-            # add_track_or_counter_to_db(track, creator)
+            track = self.bot.current_track[0]['title']
+            creator = self.bot.current_track[0]['creator']
+            add_track_or_counter_to_db(track, creator)
 
             url = self.bot.current_track[0]['source']
             voice_channel = self.bot.current_track[1]
@@ -47,9 +47,9 @@ class Media(commands.Cog):
             self.is_playing = True
             self.bot.current_track = self.bot.playback_queue.get()
 
-            # track = self.bot.current_track[0]['title']
-            # creator = self.bot.current_track[0]['creator']
-            # add_track_or_counter_to_db(track, creator)
+            track = self.bot.current_track[0]['title']
+            creator = self.bot.current_track[0]['creator']
+            add_track_or_counter_to_db(track, creator)
 
             url = self.bot.current_track[0]['source']
             self.vc.play(discord.FFmpegPCMAudio(url, **self.FFMPEG_OPTIONS), after=lambda e: self.play_next())

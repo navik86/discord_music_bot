@@ -1,6 +1,7 @@
 from discord import Embed
 from discord.ext import commands
 from src.media.media_source import YoutubeSource, SpotifySource
+from utils.db_api import show_top_5
 
 
 @commands.command()
@@ -67,8 +68,7 @@ async def play(ctx, *, query=None):
             await ctx.send("Трек добавлен в очередь")
 
     else:
-        url = YoutubeSource.get_by_search(query)
-        data = YoutubeSource.get_by_link(url)
+        data = YoutubeSource.get_by_search(query)
         queue.put((data, voice_channel))
         await ctx.send("Трек добавлен в очередь")
 
@@ -124,3 +124,30 @@ async def leave(ctx):
         await voice.disconnect()
     else:
         await ctx.channel.send(f'{ctx.author.mention}, бот уже отключен от войса')
+
+
+@commands.command()
+@commands.has_role('DJ')
+async def top(ctx):
+    """Показывает 5 самых популярных трэков чата"""
+
+    data = show_top_5()
+
+    # [('Goodbye', 2), ('Pink Floyd - Comfortably numb', 1)]
+
+    track_name = ctx.bot.current_track[0]['title']
+    creator_name = ctx.bot.current_track[0]['creator']
+    embed = Embed(
+        title="Текущий трек: ",
+        description=" ",
+        color=0x00ff00
+    )
+    embed.add_field(name=track_name, value=creator_name, inline=False)
+    show_queue = ctx.bot.playback_queue.queue
+    if len(show_queue) > 0:
+        embed.add_field(name="------------------", value="Очередь проигрывания:", inline=False)
+        counter = 1
+        for i in show_queue:
+            embed.add_field(name=f"{counter}. {i[0]['title']}", value=i[0]['creator'], inline=False)
+            counter += 1
+    await ctx.channel.send(embed=embed)
