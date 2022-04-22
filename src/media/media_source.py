@@ -57,6 +57,7 @@ class YoutubeSource(MediaSource):
     def get_by_link(cls, url):
         with YoutubeDL(YDL_OPTIONS) as ydl:
             info = ydl.extract_info(url, download=False)
+        print(info)
         return {'source': info['formats'][0]['url'], 'title': info['title'], 'creator': info['creator']}
 
 

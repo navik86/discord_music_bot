@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 
+from utils.db_api import add_track_or_counter_to_db
+
 
 class Media(commands.Cog):
     def __init__(self, bot):
@@ -23,6 +25,11 @@ class Media(commands.Cog):
         if self.bot.playback_queue.qsize() > 0:
             self.is_playing = True
             self.bot.current_track = self.bot.playback_queue.get()
+
+            # track = self.bot.current_track[0]['title']
+            # creator = self.bot.current_track[0]['creator']
+            # add_track_or_counter_to_db(track, creator)
+
             url = self.bot.current_track[0]['source']
             voice_channel = self.bot.current_track[1]
 
@@ -38,8 +45,13 @@ class Media(commands.Cog):
     def play_next(self):
         if self.bot.playback_queue.qsize() > 0:
             self.is_playing = True
-            item = self.bot.playback_queue.get()
-            url = item[0]['source']
+            self.bot.current_track = self.bot.playback_queue.get()
+
+            # track = self.bot.current_track[0]['title']
+            # creator = self.bot.current_track[0]['creator']
+            # add_track_or_counter_to_db(track, creator)
+
+            url = self.bot.current_track[0]['source']
             self.vc.play(discord.FFmpegPCMAudio(url, **self.FFMPEG_OPTIONS), after=lambda e: self.play_next())
         else:
             self.is_playing = False

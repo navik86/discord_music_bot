@@ -2,6 +2,8 @@ from discord.ext import commands
 from config import config
 import queue
 
+from utils.db_api import connection_db
+
 
 class MusicBot(commands.Bot):
 
@@ -16,6 +18,7 @@ class MusicBot(commands.Bot):
         self.setup()
         if additional_commands:
             self.register_commands(additional_commands)
+        self.connect_db()
 
     def setup(self):
         print("Running setup...")
@@ -36,7 +39,8 @@ class MusicBot(commands.Bot):
         print("Running src...")
         super().run(config.BOT_TOKEN, reconnect=True)
 
+    def connect_db(self):
+        connection_db()
+
     async def on_ready(self):
         print('Bot is ready!')
-
-
