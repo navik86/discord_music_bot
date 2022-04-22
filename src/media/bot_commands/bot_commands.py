@@ -1,7 +1,6 @@
 from discord import Embed
 from discord.ext import commands
 from src.media.media_source import YoutubeSource, SpotifySource
-from utils.db_api import show_top_5
 
 
 @commands.command()
@@ -129,25 +128,17 @@ async def leave(ctx):
 @commands.command()
 @commands.has_role('DJ')
 async def top(ctx):
-    """Показывает 5 самых популярных трэков чата"""
+    """Показывает 5 самых популярных треков чата"""
 
-    data = show_top_5()
+    data = ctx.bot.show_top_5_tracks()
 
-    # [('Goodbye', 2), ('Pink Floyd - Comfortably numb', 1)]
-
-    track_name = ctx.bot.current_track[0]['title']
-    creator_name = ctx.bot.current_track[0]['creator']
     embed = Embed(
-        title="Текущий трек: ",
+        title="Топ 5 треков: ",
         description=" ",
         color=0x00ff00
     )
-    embed.add_field(name=track_name, value=creator_name, inline=False)
-    show_queue = ctx.bot.playback_queue.queue
-    if len(show_queue) > 0:
-        embed.add_field(name="------------------", value="Очередь проигрывания:", inline=False)
-        counter = 1
-        for i in show_queue:
-            embed.add_field(name=f"{counter}. {i[0]['title']}", value=i[0]['creator'], inline=False)
-            counter += 1
+    counter = 1
+    for i in data:
+        embed.add_field(name=f"{counter}. {i[0]}", value=f"{i[1]} plays", inline=False)
+        counter += 1
     await ctx.channel.send(embed=embed)

@@ -1,8 +1,8 @@
 from discord.ext import commands
-from config import config
+from config.config import PREFIX, BOT_TOKEN
 import queue
 
-from utils.db_api import connection_db
+from utils.db_api import connection_db, show_top_5
 
 
 class MusicBot(commands.Bot):
@@ -12,13 +12,13 @@ class MusicBot(commands.Bot):
         self.current_track = None
         self._cogs = ["src.media.media"]
         super().__init__(
-            command_prefix=config.PREFIX,
+            command_prefix=PREFIX,
             case_insensitive=True,
         )
         self.setup()
         if additional_commands:
             self.register_commands(additional_commands)
-        self.connect_db()
+        # self.connect_db()
 
     def setup(self):
         print("Running setup...")
@@ -35,12 +35,17 @@ class MusicBot(commands.Bot):
             for j in item:
                 self.add_command(j)
 
+    def show_top_5_tracks(self):
+        return show_top_5()
+
     def run(self):
         print("Running src...")
-        super().run(config.BOT_TOKEN, reconnect=True)
+        super().run(BOT_TOKEN, reconnect=True)
 
-    def connect_db(self):
-        connection_db()
+    # def connect_db(self):
+    #     connection_db()
 
     async def on_ready(self):
+
+        connection_db()
         print('Bot is ready!')
