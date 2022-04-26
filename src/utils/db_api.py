@@ -1,11 +1,11 @@
-import psycopg2
+from psycopg2 import connect
 from config.config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME
 
 
 def connection_db():
     global connection
     try:
-        connection = psycopg2.connect(
+        connection = connect(
             host=DB_HOST,
             user=DB_USER,
             password=DB_PASSWORD,
