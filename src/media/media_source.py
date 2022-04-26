@@ -100,20 +100,19 @@ class SpotifySource(MediaSource):
 
         # получение информации о треке в зависимости от типа ссылки
         if link_type == 'track':
-            cls.get_info_from_spotify_link_track(_id)
+            return cls.get_info_from_spotify_link_track(_id)
 
         elif link_type == 'album':
-            cls.get_info_from_spotify_link_album(_id)
+            return cls.get_info_from_spotify_link_album(_id)
 
         elif link_type == 'playlist':
-            cls.get_info_from_spotify_link_playlist(_id)
+            return cls.get_info_from_spotify_link_playlist(_id)
         else:
             return 'Unknown spotify url'
 
     @classmethod
     def get_info_from_spotify_link_track(cls, _id):
         information = spotify_client.track(_id)
-        print(information)
         track_name = ''
         for artist in information['artists']:
             if information['artists'].index(artist) == 0:
@@ -130,7 +129,6 @@ class SpotifySource(MediaSource):
     @classmethod
     def get_info_from_spotify_link_album(cls, _id):
         information = spotify_client.album(_id)
-        print(information)
         tracks = []
         for track in information['tracks']['items']:
             track_name = ''
@@ -154,7 +152,6 @@ class SpotifySource(MediaSource):
     @classmethod
     def get_info_from_spotify_link_playlist(cls, _id):
         information = spotify_client.playlist(_id)
-        print(information)
         tracks = []
         for track in information['tracks']['items']:
             track_name = ''
