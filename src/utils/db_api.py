@@ -65,5 +65,3 @@ def show_top_5():
         for row in cursor:
             top_list.append(row)
     return top_list
-
-

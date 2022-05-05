@@ -19,4 +19,4 @@ class DatabaseTest(unittest.TestCase):
         connect_mock.return_value = connection
 
         connection_db()
-        self.assertEqual(True, check_track('Smells Like Teen Spirit'))
+        assert check_track('Smells Like Teen Spirit')
